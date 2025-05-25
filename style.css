@@ -1,0 +1,202 @@
+/* Globale Variablen */
+:root {
+	--primary-color: #34495e;
+	--secondary-color: #2c3e50;
+	--text-color: #ffffff;
+	--border-radius: 8px;
+	--gap: 1rem;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background: #ecf0f1;
+	color: var(--secondary-color);
+	margin: 0;
+	padding: 0;
+}
+
+.container {
+	display: grid;
+	grid-template-areas: "header header"
+		"allgemeine-informationen allgemeine-informationen"
+		"linkeSeite rechteSeite" "linkeSeiteE rechteSeiteE"
+		"linkeSeiteE2 rechteSeiteE2" "linkeSeiteE3 rechteSeiteE3"
+		"diskussion diskussion" "main main" "footer footer";
+	grid-template-columns: 1fr 1fr;
+	gap: var(--gap);
+	max-width: 1200px;
+	margin: auto;
+	padding: 1rem;
+}
+
+/* Sticky Header */
+header {
+	position: sticky;
+	top: 0;
+	grid-area: header;
+	background: var(--primary-color);
+	color: white;
+	padding: 1.25rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	justify-content: space-between;
+}
+
+.header-inhalt h1 {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+/* Inhalt im Header nebeneinander ausrichten */
+.header-inhalt {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+header button {
+	padding: 0.5rem 1rem;
+	background: #2ecc71;
+	border: none;
+	border-radius: 5px;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+header button:hover {
+	background: #27ae60;
+}
+
+.allgemeine-informationen, .diskussion, main, footer {
+	background: white;
+	padding: 1rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.allgemeine-informationen {
+	grid-area: allgemeine-informationen;
+}
+
+.linkeSeite {
+	grid-area: linkeSeite;
+}
+
+.rechteSeite {
+	grid-area: rechteSeite;
+}
+
+.linkeSeiteE {
+	grid-area: linkeSeiteE;
+}
+
+.rechteSeiteE {
+	grid-area: rechteSeiteE;
+}
+
+.diskussion {
+	grid-area: diskussion;
+}
+
+.linkeSeiteE2 {
+	grid-area: linkeSeiteE2;
+}
+
+.rechteSeiteE2 {
+	grid-area: rechteSeiteE2;
+}
+
+.linkeSeiteE3 {
+	grid-area: linkeSeiteE3;
+}
+
+.rechteSeiteE3 {
+	grid-area: rechteSeiteE3;
+}
+
+.linkeSeite, .rechteSeite, .linkeSeiteE, .rechteSeiteE, .linkeSeiteE2,
+	.rechteSeiteE2, .linkeSeiteE3, .rechteSeiteE3 {
+	background: var(--primary-color);
+	color: var(--text-color);
+	padding: 1rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+main {
+	grid-area: main;
+}
+
+footer {
+	grid-area: footer;
+	text-align: center;
+	background: var(--primary-color);
+	color: white;
+}
+
+.grid-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+canvas {
+	background: #fff;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#loadingOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(255, 255, 255, 0.95);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	font-size: 1.2rem;
+	color: #2c3e50;
+}
+
+.spinner {
+	border: 6px solid #ccc;
+	border-top: 6px solid #3498db;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	animation: spin 1s linear infinite;
+	margin-bottom: 20px;
+}
+
+@keyframes spin {to { transform:rotate(360deg);
+	
+}
+
+}
+body.dark {
+	background: #121212;
+	color: #e0e0e0;
+}
+
+body.dark header, body.dark footer, body.dark .linkeSeite, body.dark .rechteSeite,
+	body.dark .linkeSeiteE, body.dark .rechteSeiteE, body.dark .linkeSeiteE2,
+	body.dark .rechteSeiteE2, body.dark .linkeSeiteE3, body.dark .rechteSeiteE3
+	{
+	background: #2c3e50;
+	color: #ecf0f1;
+}
+
+body.dark .allgemeine-informationen, body.dark .diskussion, body.dark main
+	{
+	background: #1e1e1e;
+	color: #e0e0e0;
+}
+
+body.dark canvas {
+	background: #2e2e2e;
+}

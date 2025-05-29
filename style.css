@@ -1,4 +1,4 @@
-/* Globale Variablen */
+/* style.css */
 :root {
 	--primary-color: #34495e;
 	--secondary-color: #2c3e50;
@@ -19,15 +19,86 @@ body {
 	display: grid;
 	grid-template-areas: "header header"
 		"allgemeine-informationen allgemeine-informationen"
+		"daten-config daten-config" "model-config model-config"
 		"linkeSeite rechteSeite" "linkeSeiteE rechteSeiteE"
-		"linkeSeiteE2 rechteSeiteE2" "linkeSeiteE3 rechteSeiteE3"
-		"diskussion diskussion" "main main" "footer footer";
+		"linkeSeiteE2 rechteSeiteE2" "epochen-regler epochen-regler"
+		"linkerechteSeiteE2 linkerechteSeiteE2" "linkeSeiteE3 rechteSeiteE3"
+		"epochen-regler2 epochen-regler2"
+		"linkerechteSeiteE3 linkerechteSeiteE3" "diskussion diskussion"
+		"main main" "footer footer";
 	grid-template-columns: 1fr 1fr;
 	gap: var(--gap);
 	max-width: 1200px;
 	margin: auto;
 	padding: 1rem;
 }
+
+.model-config {
+	grid-area: model-config;
+	background: white;
+	padding: 1rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.daten-config {
+	grid-area: daten-config;
+	background: white;
+	padding: 1rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.model-config h3 {
+	margin-top: 0;
+}
+
+.daten-config h3 {
+	margin-top: 0;
+}
+
+.model-config label {
+	display: block;
+	margin: 0.5rem 0 0.25rem;
+}
+
+.daten-config label {
+	display: block;
+	margin: 0.5rem 0 0.25rem;
+}
+
+.model-config input, .model-config select {
+	padding: 0.25rem;
+	width: 100%;
+	margin-bottom: 1rem;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+}
+
+body.dark .model-config {
+	background: #1e1e1e;
+	color: #e0e0e0;
+}
+
+body.dark .daten-config {
+	background: #1e1e1e;
+	color: #e0e0e0;
+}
+
+body.dark .model-config input, body.dark .model-config select {
+	background: #2c3e50;
+	color: #ecf0f1;
+	border-color: #444;
+}
+
+body.dark .daten-config input, body.dark .daten-config select {
+	background: #2c3e50;
+	color: #ecf0f1;
+	border-color: #444;
+}
+
+/* Bestehende Definitionen erhalten */
+/* ... darunter folgt dein vorhandener Stil unverändert ... */
 
 /* Sticky Header */
 header {
@@ -52,6 +123,11 @@ header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+}
+
+#applyDataParams {
+	display: block;
+	margin-top: 10px;
 }
 
 header button {
@@ -93,6 +169,14 @@ header button:hover {
 
 .rechteSeiteE {
 	grid-area: rechteSeiteE;
+}
+
+.epochen-regler {
+	grid-area: epochen-regler;
+}
+
+.epochen-regler2 {
+	grid-area: epochen-regler2;
 }
 
 .diskussion {
@@ -141,6 +225,63 @@ footer {
 	gap: 1rem;
 }
 
+.epochen-regler, .epochen-regler2 {
+	padding: 0.5rem;
+	background: white;
+	border-radius: 8px;
+	margin-top: 1rem;
+}
+
+.linkerechteSeiteE2 {
+	grid-area: linkerechteSeiteE2;
+	background: white;
+	padding: 1rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.linkerechteSeiteE3 {
+	grid-area: linkerechteSeiteE3;
+	background: white;
+	padding: 1rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#loss-chart-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#loss-chart-container canvas {
+	width: 100%;
+	max-width: 900px;
+	max-height: 300px;
+}
+
+#loss-chart-container2 {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#loss-chart-container2 canvas {
+	width: 100%;
+	max-width: 900px;
+	max-height: 300px;
+}
+
+body.dark .epochen-regler {
+	background: #1e1e1e;
+	color: #e0e0e0;
+}
+
+body.dark .epochen-regler2 {
+	background: #1e1e1e;
+	color: #e0e0e0;
+}
+
 canvas {
 	background: #fff;
 	border-radius: 5px;
@@ -173,7 +314,25 @@ canvas {
 	margin-bottom: 20px;
 }
 
-@keyframes spin {to { transform:rotate(360deg);
+.collapsible-section .section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.collapsible-section .toggle-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 0.9rem;
+}
+
+.collapsible-section.collapsed .section-content {
+	display: none;
+}
+
+keyframes spin {to { transform:rotate(360deg);
 	
 }
 
@@ -183,12 +342,51 @@ body.dark {
 	color: #e0e0e0;
 }
 
+body.dark .toggle-button {
+	color: #ecf0f1;
+}
+
+body.dark .toggle-button:hover {
+	color: #2ecc71;
+}
+
+.config-button {
+	display: block;
+	margin-top: 10px;
+	padding: 0.5rem 1rem;
+	font-weight: bold;
+	border-radius: 5px;
+	border: none;
+	background-color: #2ecc71;
+	color: white;
+	cursor: pointer;
+}
+
+.config-button:hover {
+	background-color: #27ae60;
+}
+
+body.dark .config-button {
+	background-color: #2ecc71;
+	color: white;
+}
+
+body.dark .config-button:hover {
+	background-color: #27ae60;
+}
+
 body.dark header, body.dark footer, body.dark .linkeSeite, body.dark .rechteSeite,
 	body.dark .linkeSeiteE, body.dark .rechteSeiteE, body.dark .linkeSeiteE2,
 	body.dark .rechteSeiteE2, body.dark .linkeSeiteE3, body.dark .rechteSeiteE3
 	{
 	background: #2c3e50;
 	color: #ecf0f1;
+}
+
+body.dark .linkerechteSeiteE2, body.dark .linkerechteSeiteE3 {
+	background: #2c3e50;
+	color: #ecf0f1;
+	box-shadow: none;
 }
 
 body.dark .allgemeine-informationen, body.dark .diskussion, body.dark main

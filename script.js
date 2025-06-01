@@ -37,7 +37,8 @@ window.addEventListener("load", async () => {
 	const yNoisy = yClean.map(y => y + gaussianNoise(0, Math.sqrt(noiseVar)));  // mit Rauschen
 
 	// Indizes für Zufalls-Shuffle → Split in Training und Test
-	const indices = Array.from(tf.util.createShuffledIndices(N));
+	const indices = Array.from({ length: N }, (_, i) => i);
+	indices.sort(() => Math.random() - 0.5);
 	const splitCount = Math.floor(N / 2);
 	const trainIndices = indices.slice(0, splitCount);
 	const testIndices = indices.slice(splitCount);
@@ -60,15 +61,30 @@ window.addEventListener("load", async () => {
 	};
 
 	// Erzeuge ein FFNN-Modell mit gegebener Architektur
-	function createModel(hiddenUnits = [100, 100]) {
+	function createModel(hiddenUnits = [100, 100], activation = 'relu') {
 		const model = tf.sequential();
-		model.add(tf.layers.dense({ units: hiddenUnits[0], activation: 'relu', inputShape: [1] }));
+		model.add(tf.layers.dense({
+			units: hiddenUnits[0],
+			activation,
+			inputShape: [1],
+			kernelInitializer: tf.initializers.glorotUniform({ seed }),
+			biasInitializer: tf.initializers.zeros()
+		}));
 		for (let i = 1; i < hiddenUnits.length; i++) {
-			model.add(tf.layers.dense({ units: hiddenUnits[i], activation: 'relu' }));
+			model.add(tf.layers.dense({
+				units: hiddenUnits[i],
+				activation,
+				kernelInitializer: tf.initializers.glorotUniform({ seed }),
+				biasInitializer: tf.initializers.zeros()
+			}));
 		}
-		model.add(tf.layers.dense({ units: 1 })); // Lineare Ausgabe
+		model.add(tf.layers.dense({
+			units: 1,
+			kernelInitializer: tf.initializers.glorotUniform({ seed }),
+			biasInitializer: tf.initializers.zeros()
+		}));
 		model.compile({
-			optimizer: tf.train.adam(0.01),
+			optimizer: tf.train.adam(0.01), // schon "sicherer" für große Netze
 			loss: 'meanSquaredError'
 		});
 		return model;
@@ -87,7 +103,7 @@ window.addEventListener("load", async () => {
 
 	// Trainiere Modell auf Tensor-Daten
 	const trainModel = async (model, xT, yT, epochs) => {
-		await model.fit(xT, yT, { epochs, batchSize: 32, shuffle: true });
+		await model.fit(xT, yT, { epochs, batchSize: 32, shuffle: false });
 	};
 
 	// Evaluiere Modell, berechne MSE und gib Vorhersagen zurück
@@ -99,16 +115,17 @@ window.addEventListener("load", async () => {
 		const yTrueArray = await yT.array();
 		const yPredArray = await predReshaped.array();
 
-		console.log("MSE (eval):", mse);
-		console.log("  yTrue vs yPred (erste 5):", yTrueArray.slice(0, 5), yPredArray.slice(0, 5));
-
-		console.log("yTrue vs yPred (erste 10 Werte):");
-		for (let i = 0; i < 20; i++) {
-			console.log(`  ${i}: true=${yTrueArray[i][0].toFixed(4)}  pred=${yPredArray[i][0].toFixed(4)}`);
-		}
+		//		for (let i = 0; i < 20; i++) {
+		//			console.log(`  ${i}: true=${yTrueArray[i][0].toFixed(4)}  pred=${yPredArray[i][0].toFixed(4)}`);
+		//		}
 
 		return [yPredArray.map(e => e[0]), mse, yTrueArray.map(e => e[0])];
 	};
+
+	function getSelectedActivation() {
+		const select = document.getElementById("activationSelect");
+		return select?.value || 'relu';
+	}
 
 	let lossChart;
 
@@ -146,10 +163,10 @@ window.addEventListener("load", async () => {
 					},
 				},
 				scales: {
-				  x: {
-				    type: "linear",  // explizit numerisch
-				    title: { display: true, text: "Epoche" }
-				  },
+					x: {
+						type: "linear",  // explizit numerisch
+						title: { display: true, text: "Epoche" }
+					},
 					y: { title: { display: true, text: "Loss (MSE)" } },
 				},
 			},
@@ -195,10 +212,10 @@ window.addEventListener("load", async () => {
 					},
 				},
 				scales: {
-				  x: {
-				    type: "linear",  // explizit numerisch
-				    title: { display: true, text: "Epoche" }
-				  },
+					x: {
+						type: "linear",  // explizit numerisch
+						title: { display: true, text: "Epoche" }
+					},
 					y: { title: { display: true, text: "Loss (MSE)" } },
 				},
 			},
@@ -316,8 +333,8 @@ window.addEventListener("load", async () => {
 	const [_, yTe2] = toTensor(xTest, yTestNoisy);
 
 	// Modelle trainieren
-	await trainModel(modelClean, xT1, yT1, 100);
-	await trainModel(modelOver, xT2, yT2, 300);
+	await trainModel(modelClean, xT1, yT1, 1000);
+	await trainModel(modelOver, xT2, yT2, 1000);
 
 	// Modelle evaluieren
 	const [yP1, mseTrain1] = await evaluateModel(modelClean, xT1, yT1);
@@ -328,30 +345,31 @@ window.addEventListener("load", async () => {
 	// Funktion zum Trainieren und Zeichnen des Best-Fit-Modells
 	async function trainAndDrawBestFit(epochs) {
 		const hiddenUnits = getModelArchitectureFromUI();
-		const modelBest = createModel(hiddenUnits);
+		const activation = getSelectedActivation();
+		const modelBest = createModel(hiddenUnits, activation);
 		//    await trainModel(modelBest, xT2, yT2, epochs);
 
 		if (lossChart) {
-		  lossChart.destroy(); // vorherige Instanz entfernen
+			lossChart.destroy(); // vorherige Instanz entfernen
 		}
 		initLossChart(); // neuen Chart aufsetzen
-		
+
 		// WICHTIG: Chart-Daten vollständig zurücksetzen
 		lossChart.data.labels = [];
 		lossChart.data.datasets.forEach(ds => ds.data = []);
 		lossChart.update();
 
 		for (let epoch = 1; epoch <= epochs; epoch++) {
-		    const history = await modelBest.fit(xT2, yT2, { epochs: 1, shuffle: true });
+			const history = await modelBest.fit(xT2, yT2, { epochs: 1, shuffle: false });
 
-		    // Verwende evaluateModel für konsistente MSE-Werte
-		    const [_, mseTrain] = await evaluateModel(modelBest, xT2, yT2);
-		    const [__, mseTest] = await evaluateModel(modelBest, xTe, yTe2);
+			// Verwende evaluateModel für konsistente MSE-Werte
+			const [_, mseTrain] = await evaluateModel(modelBest, xT2, yT2);
+			const [__, mseTest] = await evaluateModel(modelBest, xTe, yTe2);
 
-		    lossChart.data.labels.push(Number(epoch));
-		    lossChart.data.datasets[0].data.push(mseTrain);
-		    lossChart.data.datasets[1].data.push(mseTest);
-		    lossChart.update();
+			lossChart.data.labels.push(Number(epoch));
+			lossChart.data.datasets[0].data.push(mseTrain);
+			lossChart.data.datasets[1].data.push(mseTest);
+			lossChart.update();
 		}
 
 		// ALLES aus Tensoren holen – synchron!
@@ -361,11 +379,6 @@ window.addEventListener("load", async () => {
 		const xTrainSorted = (await xT2.array()).map(e => e[0]);
 		const yTrainSorted = (await yT2.array()).map(e => e[0]);
 		const xTestSorted = (await xTe.array()).map(e => e[0]);
-
-		console.log(`📈 [Best-Fit] Epochen: ${epochs}`);
-		console.log(`   ↳ MSE Train: ${mseTrain2.toFixed(6)}`);
-		console.log(`   ↳ MSE Test:  ${mseTest2.toFixed(6)}`);
-		console.log("   ↳ Architektur:", hiddenUnits);
 
 		document.getElementById("plot-vorhersage-train-best").innerHTML = "";
 		document.getElementById("plot-vorhersage-test-best").innerHTML = "";
@@ -392,44 +405,67 @@ window.addEventListener("load", async () => {
 	}
 
 	//Training für Overfit - Modell mit Lernkurve
+
+
+
 	async function trainAndDrawOverfit(epochs) {
+		let lastMseTest = null;
+		document.getElementById("progress-overfit").textContent = `Training gestartet... (0 / ${epochs})`;
 		const hiddenUnits = getModelArchitectureFromUI();
-		const modelOverfit = createModel(hiddenUnits);
+		const activation = getSelectedActivation();
+		const modelOverfit = createModel(hiddenUnits, activation);
 
 		if (lossChart2) {
-		  lossChart2.destroy(); // vorherige Instanz entfernen
+			lossChart2.destroy(); // vorherige Instanz entfernen
 		}
 		initLossChart2(); // neuen Chart aufsetzen
 
-		// NEU: Chart-Daten zurücksetzen
-		lossChart2.data.labels = [];
-		lossChart2.data.datasets.forEach(ds => ds.data = []);
-		lossChart2.update();
+		const labels = [];
+		const trainLosses = [];
+		const testLosses = [];
 
 		for (let epoch = 1; epoch <= epochs; epoch++) {
-		    const history = await modelOverfit.fit(xT2, yT2, { epochs: 1, shuffle: true });
+			// TRAIN LOSS → direkt aus fit()
+			const history = await modelOverfit.fit(xT2, yT2, { epochs: 1, shuffle: false });
+			const mseTrain = history.history.loss[0];
 
-		    // Verwende evaluateModel wie im Best-Fit
-		    const [_, mseTrain] = await evaluateModel(modelOverfit, xT2, yT2);
-		    const [__, mseTest] = await evaluateModel(modelOverfit, xTe, yTe2);
+			let mseTest = null;
+			if (epoch % 10 === 0 || epoch === epochs) {
+				const testEval = await modelOverfit.evaluate(xTe, yTe2, { batchSize: 32, verbose: 0 });
+				mseTest = (await testEval.data())[0];
+				lastMseTest = mseTest;  // speichern
+			} else {
+				mseTest = lastMseTest;  // letzten Wert wiederholen
+			}
 
-		    lossChart2.data.labels.push(Number(epoch));
-		    lossChart2.data.datasets[0].data.push(mseTrain);
-		    lossChart2.data.datasets[1].data.push(mseTest);
-		    lossChart2.update();
+			// NUR IN ARRAYS schreiben
+			labels.push(epoch);
+			trainLosses.push(mseTrain);
+			testLosses.push(mseTest);
+
+			if (epoch % 10 === 0 || epoch === epochs) {
+				document.getElementById("progress-overfit").textContent = `Training läuft... (${epoch} / ${epochs})`;
+			}
 		}
 
-		// ALLES aus Tensoren holen – synchron!
+		// Chart final updaten
+		lossChart2.data.labels = labels;
+		lossChart2.data.datasets[0].data = trainLosses;
+		lossChart2.data.datasets[1].data = testLosses;
+		lossChart2.update();
+
+		// Final: Prediction Plots (evaluateModel bleibt hier sinnvoll)
 		const [yP4, mseTrain4] = await evaluateModel(modelOverfit, xT2, yT2);
 		const [yPt4, mseTest4] = await evaluateModel(modelOverfit, xTe, yTe2);
 		const xTrainSorted = (await xT2.array()).map(e => e[0]);
 		const yTrainSorted = (await yT2.array()).map(e => e[0]);
 		const xTestSorted = (await xTe.array()).map(e => e[0]);
 
-		console.log(`📈 [Overfit] Epochen: ${epochs}`);
+		console.log(`📈 [Overfit] Fertig! Epochen: ${epochs}`);
 		console.log(`   ↳ MSE Train: ${mseTrain4.toFixed(6)}`);
 		console.log(`   ↳ MSE Test:  ${mseTest4.toFixed(6)}`);
 		console.log("   ↳ Architektur:", hiddenUnits);
+		console.log("   ↳ Aktivierung:", activation);
 
 		document.getElementById("plot-vorhersage-train").innerHTML = "";
 		document.getElementById("plot-vorhersage-test").innerHTML = "";
@@ -453,14 +489,17 @@ window.addEventListener("load", async () => {
 			mseTest4,
 			"#3498db"
 		);
+
+		document.getElementById("progress-overfit").textContent = `✅ Training abgeschlossen. Epochen: ${epochs}`;
 	}
 
+
 	// Initiales Training (Best-Fit)
-	const initialEpochs = 50;
+	const initialEpochs = 117;
 	setTimeout(() => trainAndDrawBestFit(initialEpochs), 0);  // Sicherstellen, dass DOM bereit ist
 
 	// Initiales Training (Overfit)
-	const initialOverfitEpochs = 300;
+	const initialOverfitEpochs = 5000;
 	setTimeout(() => trainAndDrawOverfit(initialOverfitEpochs), 0);
 
 	// Daten- und Vorhersage-Diagramme zeichnen
@@ -478,13 +517,13 @@ window.addEventListener("load", async () => {
 	const epochValue = document.getElementById("epochValue");
 	let debounceTimer;
 	epochSlider.addEventListener("input", (e) => {
-	  const val = parseInt(e.target.value);
-	  epochValue.textContent = val;
+		const val = parseInt(e.target.value);
+		epochValue.textContent = val;
 
-	  clearTimeout(debounceTimer);
-	  debounceTimer = setTimeout(() => {
-	    trainAndDrawBestFit(val);
-	  }, 500); // erst nach 500ms Stillstand trainieren
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			trainAndDrawBestFit(val);
+		}, 500); // erst nach 500ms Stillstand trainieren
 	});
 
 	async function reinitializeAndTrainAllModels() {
@@ -503,8 +542,8 @@ window.addEventListener("load", async () => {
 		loadingText.textContent = "📊 Trainiere Modelle...";
 
 		// Neu trainieren
-		await trainModel(modelClean, xT1, yT1, 100);
-		await trainModel(modelOver, xT2, yT2, 300);
+		await trainModel(modelClean, xT1, yT1, 1000);
+		await trainModel(modelOver, xT2, yT2, 1000);
 
 		// Neu evaluieren
 		const [yP1, mseTrain1] = await evaluateModel(modelClean, xT1, yT1);
@@ -527,14 +566,6 @@ window.addEventListener("load", async () => {
 		await reinitializeAndTrainAllModels();
 	});
 
-
-	// Diskussions-Text anzeigen
-	const diskussion = `
-Modell auf unverrauschten Daten: Train/Test MSE nahezu identisch.
-Best-Fit Modell auf verrauschten Daten: gute Generalisierung.
-Over-Fit Modell: stark überangepasst, Train-MSE << Test-MSE.
-→ Overfitting sichtbar, wenn Trainingsfehler klein, Testfehler hoch.`;
-
 	document.getElementById("numPoints").addEventListener("input", e => {
 		document.getElementById("numPointsValue").textContent = e.target.value;
 	});
@@ -542,7 +573,7 @@ Over-Fit Modell: stark überangepasst, Train-MSE << Test-MSE.
 	document.getElementById("noiseVar").addEventListener("input", e => {
 		document.getElementById("noiseVarValue").textContent = e.target.value;
 	});
-	
+
 	document.getElementById("applyDataParams").addEventListener("click", async () => {
 		N = parseInt(document.getElementById("numPoints").value);
 		noiseVar = parseFloat(document.getElementById("noiseVar").value);
@@ -557,8 +588,6 @@ Over-Fit Modell: stark überangepasst, Train-MSE << Test-MSE.
 		location.reload();
 	});
 
-	document.getElementById("diskussionText").textContent = diskussion;
-
 	// Ladeanzeige ausblenden
 	setTimeout(() => {
 		overlay.style.display = "none";
@@ -569,28 +598,47 @@ Over-Fit Modell: stark überangepasst, Train-MSE << Test-MSE.
 		const isDark = document.body.classList.toggle("dark");
 		document.getElementById("darkModeToggle").textContent =
 			isDark ? "☀️ Light Mode aktivieren" : "🌙 Dark Mode aktivieren";
+
+		const screenshotImg = document.getElementById("screenshot-img");
+		if (screenshotImg) {
+			screenshotImg.src = isDark ? "overfit-details_dark.png" : "overfit-details.png";
+		}
 	});
 
 	let debounceTimer2;
 	document.getElementById("epochSlider2").addEventListener("input", async (e) => {
 		const val = parseInt(e.target.value);
 		document.getElementById("epochValue2").textContent = val;
-		
+
 		clearTimeout(debounceTimer2);
 		debounceTimer2 = setTimeout(() => {
-		  trainAndDrawOverfit(val);
+			trainAndDrawOverfit(val);
 		}, 500); // erst nach 500ms Stillstand trainieren
 
 	});
-	
+
 	// Ein-/Ausklapp-Logik
 	document.querySelectorAll(".collapsible-section .toggle-button").forEach(btn => {
-	  btn.addEventListener("click", () => {
-	    const section = btn.closest(".collapsible-section");
-	    section.classList.toggle("collapsed");
-	    btn.textContent = section.classList.contains("collapsed") ? "⬆️ Ausklappen" : "⬇️ Einklappen";
-	  });
+		btn.addEventListener("click", () => {
+			const section = btn.closest(".collapsible-section");
+			section.classList.toggle("collapsed");
+			btn.textContent = section.classList.contains("collapsed") ? "⬆️ Ausklappen" : "⬇️ Einklappen";
+		});
 	});
-	
+
+	// Toggle Screenshot Button (R4)
+	document.getElementById("toggle-screenshot").addEventListener("click", () => {
+		const container = document.getElementById("screenshot-container");
+		const btn = document.getElementById("toggle-screenshot");
+
+		if (container.style.display === "none") {
+			container.style.display = "block";
+			btn.textContent = "📷 Vorschau für 20000 Epochen ausblenden";
+		} else {
+			container.style.display = "none";
+			btn.textContent = "📷 Vorschau für 20000 Epochen anzeigen";
+		}
+	});
+
 
 });

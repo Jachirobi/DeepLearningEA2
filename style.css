@@ -375,6 +375,36 @@ body.dark .config-button:hover {
 	background-color: #27ae60;
 }
 
+/* Vorschau-Button */
+#toggle-screenshot {
+	background-color: #2ecc71; /* grün */
+	color: white;
+	border: none;
+	padding: 8px 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.3s;
+}
+
+#toggle-screenshot:hover {
+	background-color: #27ae60;
+}
+
+/* Screenshot-Container */
+#screenshot-container {
+	background-color: #ffffff; /* Default: light */
+	padding: 10px;
+	border-radius: 8px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* DARK MODE Anpassungen */
+body.dark #screenshot-container {
+	background-color: #2c3e50; /* dunkler Hintergrund für Bildrahmen */
+	box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
 body.dark header, body.dark footer, body.dark .linkeSeite, body.dark .rechteSeite,
 	body.dark .linkeSeiteE, body.dark .rechteSeiteE, body.dark .linkeSeiteE2,
 	body.dark .rechteSeiteE2, body.dark .linkeSeiteE3, body.dark .rechteSeiteE3
@@ -397,4 +427,23 @@ body.dark .allgemeine-informationen, body.dark .diskussion, body.dark main
 
 body.dark canvas {
 	background: #2e2e2e;
+}
+
+/* Responsive Design */
+@media ( max-width : 768px) {
+	.container {
+		grid-template-areas: "header" "allgemeine-informationen" "daten-config"
+			"model-config" "linkeSeite" "rechteSeite" "linkeSeiteE"
+			"rechteSeiteE" "linkeSeiteE2" "rechteSeiteE2" "epochen-regler"
+			"linkerechteSeiteE2" "linkeSeiteE3" "rechteSeiteE3" "epochen-regler2"
+			"linkerechteSeiteE3" "diskussion" "main" "footer";
+		grid-template-columns: 1fr;
+	}
+	main {
+		grid-template-columns: 1fr;
+	}
+	th, td {
+		white-space: normal;
+		word-break: break-word;
+	}
 }

@@ -95,7 +95,8 @@
 					einstellbar:</label> <input type="range" id="noiseVar" min="0.01" max="0.5"
 					step="0.01" value="0.05"> <span id="noiseVarValue">0.05</span>
 
-				<button id="applyDataParams" class="config-button">🔁 Daten neu generieren</button>
+				<button id="applyDataParams" class="config-button">🔁 Daten
+					neu generieren</button>
 			</div>
 		</div>
 
@@ -118,7 +119,14 @@
 
 				<label for="neuronsLayer3">Neuronen in Layer 3 (1-500):</label> <input
 					type="number" id="neuronsLayer3" min="1" max="500" value="100">
-				<button id="applyArchitecture" class="config-button">🔁 Architektur ändern</button>
+				<!-- Aktivierung wählen -->
+				<label for="activationSelect">Aktivierungsfunktion:</label> <select
+					id="activationSelect">
+					<option value="relu">ReLU (Standard)</option>
+					<option value="tanh">tanh</option>
+				</select>
+				<button id="applyArchitecture" class="config-button">🔁
+					Architektur ändern</button>
 			</div>
 		</div>
 
@@ -150,9 +158,9 @@
 		<div class="epochen-regler"
 			style="grid-column: 1/span 2; text-align: center;">
 			<label for="epochSlider"><strong>Epochen für
-					Best-Fit Modell (10-100):</strong></label> <input type="range" id="epochSlider"
-				min="10" max="100" value="50" step="10"> <span
-				id="epochValue">50</span>
+					Best-Fit Modell (50-300):</strong></label> <input type="range" id="epochSlider"
+				min="50" max="300" value="117" step="10"> <span
+				id="epochValue">117</span>
 		</div>
 		<aside class="linkerechteSeiteE2">
 			<h2>R3) Lernkurve: Loss vs. Epoch</h2>
@@ -170,13 +178,26 @@
 		<div class="epochen-regler2"
 			style="grid-column: 1/span 2; text-align: center;">
 			<label for="epochSlider2"><strong>Epochen für
-					Overfit Modell (250-400):</strong></label> <input type="range" id="epochSlider2"
-				min="250" max="400" value="300" step="10"> <span
-				id="epochValue2">300</span>
+					Overfit Modell (500-20000):</strong></label> <input type="range" id="epochSlider2"
+				min="300" max="20000" value="5000" step="100"> <span
+				id="epochValue2">5000</span>
 		</div>
 		<aside class="linkerechteSeiteE3">
 			<h2>R4) Lernkurve: Loss vs. Epoch</h2>
 			<div id="loss-chart-container2" class="grid-container"></div>
+			<!-- Fortschrittsanzeige für Overfit -->
+			<div id="progress-overfit"
+				style="margin-top: 10px; font-weight: bold; color: #e67e22;">
+				Lernkurve wird geladen</div>
+			<button id="toggle-screenshot" class="config-button"
+				style="margin-top: 10px;">📷 Vorschau für 20000 Epochen
+				anzeigen</button>
+			<div id="screenshot-container"
+				style="display: none; margin-top: 10px;">
+				<img id="screenshot-img" src="overfit-details.png"
+					alt="Overfit Screenshot Details"
+					style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">
+			</div>
 		</aside>
 
 		<div class="diskussion collapsible-section">
@@ -185,7 +206,38 @@
 				<button class="toggle-button">⬇️ Einklappen</button>
 			</div>
 			<div class="section-content">
-				<p id="diskussionText"></p>
+				<p>Für die Regression der gegebenen Funktion wurde ein
+					Feedforward Neural Network (FFNN) mit konfigurierbarer Architektur
+					eingesetzt (2 Hidden-Layer, je 100 Neuronen, ReLU-Aktivierung,
+					Adam-Optimizer mit Lernrate 0.01 und Batch-Size 32). Die Anzahl der
+					Datenpunkte (N) und die Rauschvarianz (V) wurden gemäß Vorgabe
+					flexibel gestaltet (hier typischerweise N = 100, V = 0.05). Dadurch
+					konnten gezielt Auswirkungen von Datenmenge und Rauschstärke auf
+					das Modellverhalten untersucht werden.</p>
+				<p>
+					Auf den <strong>unverrauschten Daten</strong> zeigte das Modell bei
+					einer Epochenzahl von 1000 ein sehr gutes Fit-Verhalten (Train- und
+					Test-MSE < 0.0001). Bei den <strong>verrauschten Daten</strong>
+					führte ein Bereich von ca. 100-300 Epochen zu einer ausgewogenen
+					Generalisierung (Train-MSE ~0.04-0.06, Test-MSE ~0.06-0.08). Bei
+					sehr hoher Epochenanzahl (ab ca. 15.000) konnte Overfitting
+					deutlich beobachtet werden: der Train-Loss sinkt weiter (&lt;0.02),
+					während der Test-Loss ansteigt (&gt;0.12 bei 15.000 und &gt;0.32
+					bei 20.000).
+				</p>
+				<p>Änderungen an der Architektur (z.B. zusätzliche Layer oder
+					mehr Neuronen) zeigten, dass komplexere Modelle tendenziell
+					schneller zu Overfitting neigen, insbesondere bei kleinen
+					Datensätzen oder hoher Rauschvarianz. Ebenso wirkt sich die Wahl
+					der Aktivierungsfunktion auf die Lernstabilität aus (ReLU erwies
+					sich hier als robust). Die Erhöhung der Datenpunkte führte hingegen
+					zu einem schnelleren Best-Fit Verhalten und einer Angleichung
+					zwischen Test- und Trainings-MSE sowie einem viel späteren
+					Overt-Fit.</p>
+				<p>Insgesamt hat dieses Experiment sehr anschaulich
+					verdeutlicht, wie Modellkomplexität, Trainingsdauer, Datenmenge und
+					Rauschlevel gemeinsam das Lern- und Generalisierungsverhalten eines
+					neuronalen Netzes bestimmen.</p>
 			</div>
 		</div>
 
@@ -196,16 +248,64 @@
 			</div>
 			<div class="section-content">
 				<h3>1) Technisch</h3>
+				<p>In der Lösung wurden folgende Frameworks und Libraries
+					verwendet:</p>
 				<ul>
-					<li><strong>TensorFlow.js</strong> zur Modellierung, Training
-						und Vorhersage</li>
-					<li><strong>Chart.js</strong> zur Visualisierung von
-						Streudiagrammen</li>
+					<li><strong>TensorFlow.js</strong>: zur Implementierung und
+						Ausführung des neuronalen Netzes (FFNN) direkt im Browser
+						(Training, Evaluation und Inferenz).</li>
+					<li><strong>Chart.js</strong>: zur Visualisierung der
+						Lernkurven (Train- und Test-Loss über Epochen).</li>
+					<li><strong>Plotly.js</strong>: zur Visualisierung der Daten
+						und Modellvorhersagen (Streuplott der tatsächlichen und
+						vorhergesagten Werte).</li>
 				</ul>
+				<p>
+					Technische Besonderheiten der Lösung: Das gesamte Training und die
+					Modellberechnungen erfolgen vollständig clientseitig im Browser mit
+					TensorFlow.js, ohne Server oder Backend. Die Lernkurve wird
+					performant aufgebaut, indem der Train-Loss direkt aus
+					<code>fit()</code>
+					und der Test-Loss gezielt mit
+					<code>evaluate()</code>
+					ermittelt wird. Zusätzlich sind interaktive Steuerelemente (Slider
+					und Dropdowns) integriert, um Datenparameter (N, Rauschvarianz) und
+					Modellarchitektur (Layer, Neuronen, Aktivierungsfunktion) dynamisch
+					anzupassen. Eine Fortschrittsanzeige informiert während des
+					Trainings über den aktuellen Stand.
+				</p>
+
 				<h3>2) Fachlich</h3>
-				<p>Die Anwendung erstellt FFNNs, trainiert diese auf
-					verschiedenen Datenvarianten und vergleicht Vorhersagen und
-					Fehlermaße zur Analyse von Generalisierung und Overfitting.</p>
+				<p>Die Logik der Implementierung orientiert sich an der
+					Aufgabenstellung: Zunächst wird ein unverrauschter Datensatz
+					generiert und für das Modelltraining genutzt. Anschließend werden
+					verrauschte Daten erzeugt und in zwei Varianten trainiert (Best-Fit
+					und Overfit), um die Auswirkungen von Epochenzahl und
+					Modellkomplexität auf die Generalisierungsfähigkeit zu untersuchen.
+					Für das Training wird der Adam-Optimizer mit Lernrate 0.01 und
+					Batch-Size 32 eingesetzt. Die Modelle bestehen aus 1–3
+					Hidden-Layern mit konfigurierbarer Neuronenzahl und
+					ReLU-Aktivierung; der Output-Layer ist linear.</p>
+				<p>Durch die einheitliche und kontrollierte Visualisierung der
+					Lernkurven sowie der Modellvorhersagen konnten wichtige Effekte wie
+					Overfitting und Bias-Variance-Verhalten beobachtet und
+					nachvollzogen werden. Besonderer Wert wurde darauf gelegt, die
+					Testdaten strikt nur zur Evaluation zu verwenden, um eine
+					realistische Einschätzung der Modellgeneraliserung zu
+					gewährleisten.</p>
+				<p>Um den Nutzer Hilfestellungen zu geben, wurden an den
+					wichtigsten Stellen Tooltips integriert. Für die Barrierefreiheit
+					wurde versucht alles zu berücksichtigen. Dazu gehören
+					beispielsweise aria-label, alt-texte oder Kontraste bei der
+					Farbauswahl.</p>
+				<p>
+					Quellen: TensorFlow.js Dokumentation (<a
+						href="https://js.tensorflow.org" target="_blank">https://js.tensorflow.org</a>),
+					Chart.js Dokumentation (<a href="https://www.chartjs.org"
+						target="_blank">https://www.chartjs.org</a>), Plotly.js (<a
+						href="https://plotly.com/javascript/" target="_blank">https://plotly.com/javascript/</a>),
+					begleitende Vorlesungsfolien und Übungsmaterialien.
+				</p>
 			</div>
 		</main>
 		<footer>Thomas Brehmer</footer>

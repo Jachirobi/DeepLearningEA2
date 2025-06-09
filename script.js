@@ -230,6 +230,8 @@ window.addEventListener("load", async () => {
 		const sy = zipped.map(p => p.y);
 		const sp = zipped.map(p => p.pred);
 		const ctx = document.createElement("canvas");
+		ctx.setAttribute("role", "img");
+		ctx.setAttribute("aria-label", `${title} - Diagramm der tatsächlichen und vorhergesagten Werte`);
 		document.getElementById(canvasId).appendChild(ctx);
 		new Chart(ctx, {
 			type: 'scatter',
@@ -277,6 +279,8 @@ window.addEventListener("load", async () => {
 	// Zeichne Diagramm für die Eingabedaten (Train/Test)
 	function drawDatasetChart(canvasId, xTrain, yTrain, xTest, yTest, title) {
 		const ctx = document.createElement("canvas");
+		ctx.setAttribute("role", "img");
+		ctx.setAttribute("aria-label", `${title} - Diagramm der Trainings- und Testdaten`);
 		document.getElementById(canvasId).appendChild(ctx);
 		new Chart(ctx, {
 			type: 'scatter',
@@ -518,12 +522,12 @@ window.addEventListener("load", async () => {
 	let debounceTimer;
 	epochSlider.addEventListener("input", (e) => {
 		const val = parseInt(e.target.value);
-		epochValue.textContent = val;
+		epochValue.textContent = val +  " Epochen ausgewählt";
 
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
 			trainAndDrawBestFit(val);
-		}, 500); // erst nach 500ms Stillstand trainieren
+		}, 2000); // erst nach 2000ms Stillstand trainieren
 	});
 
 	async function reinitializeAndTrainAllModels() {
@@ -608,21 +612,40 @@ window.addEventListener("load", async () => {
 	let debounceTimer2;
 	document.getElementById("epochSlider2").addEventListener("input", async (e) => {
 		const val = parseInt(e.target.value);
-		document.getElementById("epochValue2").textContent = val;
+		document.getElementById("epochValue2").textContent = val +  " Epochen ausgewählt";
 
 		clearTimeout(debounceTimer2);
 		debounceTimer2 = setTimeout(() => {
 			trainAndDrawOverfit(val);
-		}, 500); // erst nach 500ms Stillstand trainieren
+		}, 2000); // erst nach 2000ms Stillstand trainieren
 
 	});
 
 	// Ein-/Ausklapp-Logik
+//	document.querySelectorAll(".collapsible-section .toggle-button").forEach(btn => {
+//		btn.addEventListener("click", () => {
+//			const section = btn.closest(".collapsible-section");
+//			section.classList.toggle("collapsed");
+//			btn.textContent = section.classList.contains("collapsed") ? "⬆️ Ausklappen" : "⬇️ Einklappen";
+//		});
+//	});
+	
 	document.querySelectorAll(".collapsible-section .toggle-button").forEach(btn => {
 		btn.addEventListener("click", () => {
 			const section = btn.closest(".collapsible-section");
-			section.classList.toggle("collapsed");
+			const contentId = btn.getAttribute("aria-controls");
+			const expanded = section.classList.toggle("collapsed");
+
 			btn.textContent = section.classList.contains("collapsed") ? "⬆️ Ausklappen" : "⬇️ Einklappen";
+			btn.setAttribute("aria-expanded", !expanded);
+
+			// Optional: dynamisch aria-hidden an content setzen
+			if (contentId) {
+				const content = document.getElementById(contentId);
+				if (content) {
+					content.setAttribute("aria-hidden", expanded ? "true" : "false");
+				}
+			}
 		});
 	});
 

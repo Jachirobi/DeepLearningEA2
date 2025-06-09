@@ -120,13 +120,16 @@
 					<option value="2" selected>2</option>
 					<option value="3">3</option>
 				</select> <label for="neuronsLayer1">Neuronen in Layer 1 (1-500):</label> <input
-					type="number" id="neuronsLayer1" min="1" max="500" value="100">
+					type="number" id="neuronsLayer1" min="1" max="500" value="100"
+					title="Anzahl der Neuronen im ersten Hidden-Layer. Mehr Neuronen erhöhen die Modellkomplexität.">
 
 				<label for="neuronsLayer2">Neuronen in Layer 2 (1-500):</label> <input
-					type="number" id="neuronsLayer2" min="1" max="500" value="100">
+					type="number" id="neuronsLayer2" min="1" max="500" value="100"
+					title="Anzahl der Neuronen im ersten Hidden-Layer. Mehr Neuronen erhöhen die Modellkomplexität.">
 
 				<label for="neuronsLayer3">Neuronen in Layer 3 (1-500):</label> <input
-					type="number" id="neuronsLayer3" min="1" max="500" value="100">
+					type="number" id="neuronsLayer3" min="1" max="500" value="100"
+					title="Anzahl der Neuronen im ersten Hidden-Layer. Mehr Neuronen erhöhen die Modellkomplexität.">
 				<!-- Aktivierung wählen -->
 				<label for="activationSelect">Aktivierungsfunktion:</label> <select
 					id="activationSelect" title="Aktivierungsfunktion wählen">
@@ -189,9 +192,9 @@
 			style="grid-column: 1/span 2; text-align: center;">
 			<label for="epochSlider2"><strong>Epochen für
 					Overfit Modell (300-20000):</strong></label> <input type="range" id="epochSlider2"
-				min="300" max="20000" value="5000" step="100"
+				min="300" max="20000" value="2000" step="100"
 				title="Epochenanzahl für Overfit Modell einstellen"> <span
-				id="epochValue2">5000 Epochen ausgewählt</span>
+				id="epochValue2">2000 Epochen ausgewählt</span>
 		</div>
 		<aside class="linkerechteSeiteE3">
 			<h2>R4) Lernkurve: Loss vs. Epoch</h2>
@@ -203,7 +206,8 @@
 			<button id="toggle-screenshot" class="config-button"
 				style="margin-top: 10px;"
 				title="Screenshot-Vorschau für 20000 Epochen ein-/ausblenden">📷
-				Vorschau für 20000 Epochen anzeigen</button>
+				Vorschau für 20000 Epochen anzeigen (bezogen auf Einstellungen der
+				Aufgabenstellung)</button>
 			<div id="screenshot-container"
 				style="display: none; margin-top: 10px;">
 				<img id="screenshot-img" src="overfit-details.png"
@@ -211,6 +215,95 @@
 					style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">
 			</div>
 		</aside>
+
+		<section class="experimente collapsible-section">
+			<div class="section-header">
+				<h2>Experimente und Fragestellungen</h2>
+				<button class="toggle-button" aria-expanded="true"
+					aria-controls="experimente-section"
+					title="Abschnitt ein- oder ausklappen">⬇️ Einklappen</button>
+			</div>
+			<div class="section-content" id="experimente-section">
+				<p>Zusätzlich zur Grundaufgabe wurden im Rahmen der Experimente
+					verschiedene Aspekte des Lernverhaltens und der
+					Generalisierungsfähigkeit des Feedforward Neural Networks (FFNN)
+					systematisch untersucht:</p>
+
+				<h3>1) Einfluss der Modellarchitektur</h3>
+				<p>Erhöht man die Anzahl der Hidden-Layer von 1 oder 2 auf 3
+					und/oder die Anzahl der Neuronen pro Layer, lernt das Modell
+					schneller und kann die Trainingsdaten sehr gut bestimmen. Dabei
+					zeigte sich, dass Overfitting in diesem Setup (glatte
+					Ziel-Funktion, relativ viele Datenpunkte) nicht unmittelbar
+					auftrat, sondern erst bei sehr hohen Epochenzahlen. Dies liegt
+					unter anderem daran, dass ein großes Netzwerk bei einer glatten
+					Funktion zunächst eine längere "Underfitting"-Phase durchläuft und
+					erst mit fortschreitendem Training beginnt, das vorhandene Rauschen
+					in den Daten zu modellieren. Gerade bei stärker verrauschten Daten
+					war dennoch beobachtbar, dass Overfitting früher und stärker
+					auftrat, je größer die Architektur war.</p>
+
+				<p>Die Wahl der Aktivierungsfunktion zeigte, dass ReLU gegenüber
+					tanh eine stabilere Konvergenz und geringeres Overfitting-Verhalten
+					aufwies.</p>
+
+				<h3>2) Einfluss der Datenmenge</h3>
+				<p>Bei einer Reduktion der Datenpunkte auf N = 50 (25 Train, 25
+					Test) war eine starke Überanpassung sichtbar; das Modell lernte die
+					Trainingsdaten, konnte aber nicht mehr gut generalisieren,
+					Overfitting trat früher auf. Bei Erhöhung auf N = 200 oder N = 500
+					wurde das Modell deutlich robuster und generalisierte wesentlich
+					besser. Overfitting trat später oder gar nicht mehr auf.</p>
+
+				<h3>3) Einfluss der Rauschstärke</h3>
+				<p>Bei starker Rauschvarianz (V ≥ 0.3) war es kaum noch möglich,
+					ein Modell zu trainieren, das die zugrunde liegende Funktion
+					zuverlässig abbildet. Bereits bei V = 0.1 zeigten sich leichte
+					Einbußen in der Generalisierung. Bei sehr niedrigem Rauschen (V ≤
+					0.01) entsprach das Verhalten weitgehend dem unverrauschten Fall.</p>
+
+				<h3>4) Einfluss der Lernrate</h3>
+				<p>Eine Lernrate von 0.01 erwies sich als gut geeignet. Bei
+					0.001 war das Training sehr langsam. Höhere Lernraten (≥ 0.05)
+					führten oft zu instabilem Verhalten oder Divergenz. Zu kleine
+					Lernraten brachten zudem die Gefahr von "zu frühem Overfitting", da
+					das Modell zu langsam optimierte.</p>
+
+				<h3>5) Dynamik des Overfittings</h3>
+				<p>Die Beobachtung der Lernkurven (Train-Loss vs. Test-Loss)
+					zeigte: Overfitting begann meist zwischen 500 und 15000 Epochen, je
+					nach Rauschen und Architektur. Bei höherer Modellkomplexität und
+					geringer Datenmenge trat Overfitting früher auf. Ein typisches
+					Signal war das Auseinanderdriften der Loss-Kurven nach einer Phase
+					synchronen Abfalls.</p>
+
+				<h3>6) Stabilität bei unterschiedlicher Initialisierung</h3>
+				<p>Mehrere Läufe mit unterschiedlichen Startwerten zeigten, dass
+					bei konstanter Architektur und Datenmenge die Resultate recht
+					stabil blieben. Bei kleinen Datensätzen (N = 50) und hohem Rauschen
+					waren die Schwankungen deutlich größer (z. B. Test-MSE von 0.1 bis
+					0.3).</p>
+
+				<h3>7) Generalisierung außerhalb des Trainingsbereichs</h3>
+				<p>Ein Experiment mit x-Werten im Bereich [-3, +3] zeigte, dass
+					das Modell erwartungsgemäß nur im Trainingsbereich [-2, +2]
+					zuverlässig vorhersagen konnte. Außerhalb dieses Bereichs
+					extrapolierte es stark unsicher und produzierte unrealistische
+					Werte. Dies unterstreicht die Bedeutung einer geeigneten
+					Datenabdeckung im Trainingsbereich.</p>
+
+				<h3>Fazit</h3>
+				<p>Die durchgeführten Experimente haben eindrucksvoll gezeigt,
+					wie Modellarchitektur, Datenmenge, Rauschstärke und
+					Optimierungsparameter das Lern- und Generalisierungsverhalten eines
+					neuronalen Netzes beeinflussen. Besonders wichtig ist dabei das
+					sorgfältige Monitoring von Overfitting anhand der Test-Loss-Kurve.
+					Die Nutzung von TensorFlow.js und die dynamische Visualisierung im
+					Browser erwiesen sich als sehr hilfreiche Werkzeuge für diese
+					Analyse.</p>
+			</div>
+		</section>
+
 
 		<div class="diskussion collapsible-section">
 			<div class="section-header">

@@ -24,8 +24,8 @@ body {
 		"linkeSeiteE2 rechteSeiteE2" "epochen-regler epochen-regler"
 		"linkerechteSeiteE2 linkerechteSeiteE2" "linkeSeiteE3 rechteSeiteE3"
 		"epochen-regler2 epochen-regler2"
-		"linkerechteSeiteE3 linkerechteSeiteE3" "diskussion diskussion"
-		"main main" "footer footer";
+		"linkerechteSeiteE3 linkerechteSeiteE3" "experimente experimente"
+		"diskussion diskussion" "main main" "footer footer";
 	grid-template-columns: 1fr 1fr;
 	gap: var(--gap);
 	max-width: 1200px;
@@ -144,7 +144,7 @@ header button:hover {
 	background: #27ae60;
 }
 
-.allgemeine-informationen, .diskussion, main, footer {
+.allgemeine-informationen, .diskussion, .experimente, main, footer {
 	background: white;
 	padding: 1rem;
 	border-radius: var(--border-radius);
@@ -177,6 +177,10 @@ header button:hover {
 
 .epochen-regler2 {
 	grid-area: epochen-regler2;
+}
+
+.experimente {
+	grid-area: experimente;
 }
 
 .diskussion {
@@ -419,8 +423,8 @@ body.dark .linkerechteSeiteE2, body.dark .linkerechteSeiteE3 {
 	box-shadow: none;
 }
 
-body.dark .allgemeine-informationen, body.dark .diskussion, body.dark main
-	{
+body.dark .allgemeine-informationen, body.dark .diskussion, body.dark .experimente,
+	body.dark main {
 	background: #1e1e1e;
 	color: #e0e0e0;
 }
@@ -436,7 +440,7 @@ body.dark canvas {
 			"model-config" "linkeSeite" "rechteSeite" "linkeSeiteE"
 			"rechteSeiteE" "linkeSeiteE2" "rechteSeiteE2" "epochen-regler"
 			"linkerechteSeiteE2" "linkeSeiteE3" "rechteSeiteE3" "epochen-regler2"
-			"linkerechteSeiteE3" "diskussion" "main" "footer";
+			"linkerechteSeiteE3" "experimente" "diskussion" "main" "footer";
 		grid-template-columns: 1fr;
 	}
 	main {

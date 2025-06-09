@@ -448,7 +448,7 @@ window.addEventListener("load", async () => {
 			testLosses.push(mseTest);
 
 			if (epoch % 10 === 0 || epoch === epochs) {
-				document.getElementById("progress-overfit").textContent = `Training läuft... (${epoch} / ${epochs})`;
+				document.getElementById("progress-overfit").textContent = `Aufbau läuft... (${epoch} / ${epochs})`;
 			}
 		}
 
@@ -503,7 +503,7 @@ window.addEventListener("load", async () => {
 	setTimeout(() => trainAndDrawBestFit(initialEpochs), 0);  // Sicherstellen, dass DOM bereit ist
 
 	// Initiales Training (Overfit)
-	const initialOverfitEpochs = 5000;
+	const initialOverfitEpochs = 2000;
 	setTimeout(() => trainAndDrawOverfit(initialOverfitEpochs), 0);
 
 	// Daten- und Vorhersage-Diagramme zeichnen
@@ -659,7 +659,7 @@ window.addEventListener("load", async () => {
 			btn.textContent = "📷 Vorschau für 20000 Epochen ausblenden";
 		} else {
 			container.style.display = "none";
-			btn.textContent = "📷 Vorschau für 20000 Epochen anzeigen";
+			btn.textContent = "📷 Vorschau für 20000 Epochen anzeigen  (bezogen auf Einstellungen der Aufgabenstellung)";
 		}
 	});
 

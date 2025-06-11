@@ -338,7 +338,7 @@ window.addEventListener("load", async () => {
 
 	// Modelle trainieren
 	await trainModel(modelClean, xT1, yT1, 1000);
-	await trainModel(modelOver, xT2, yT2, 1000);
+	await trainModel(modelOver, xT2, yT2, 2000);
 
 	// Modelle evaluieren
 	const [yP1, mseTrain1] = await evaluateModel(modelClean, xT1, yT1);
@@ -434,13 +434,13 @@ window.addEventListener("load", async () => {
 			const mseTrain = history.history.loss[0];
 
 			let mseTest = null;
-			if (epoch % 10 === 0 || epoch === epochs) {
+//			if (epoch % 10 === 0 || epoch === epochs) {
 				const testEval = await modelOverfit.evaluate(xTe, yTe2, { batchSize: 32, verbose: 0 });
 				mseTest = (await testEval.data())[0];
 				lastMseTest = mseTest;  // speichern
-			} else {
-				mseTest = lastMseTest;  // letzten Wert wiederholen
-			}
+//			} else {
+//				mseTest = lastMseTest;  // letzten Wert wiederholen
+//			}
 
 			// NUR IN ARRAYS schreiben
 			labels.push(epoch);
@@ -547,7 +547,7 @@ window.addEventListener("load", async () => {
 
 		// Neu trainieren
 		await trainModel(modelClean, xT1, yT1, 1000);
-		await trainModel(modelOver, xT2, yT2, 1000);
+		await trainModel(modelOver, xT2, yT2, 2000);
 
 		// Neu evaluieren
 		const [yP1, mseTrain1] = await evaluateModel(modelClean, xT1, yT1);

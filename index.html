@@ -232,16 +232,16 @@
 				<h3>1) Einfluss der Modellarchitektur</h3>
 				<p>Erhöht man die Anzahl der Hidden-Layer von 1 oder 2 auf 3
 					und/oder die Anzahl der Neuronen pro Layer, lernt das Modell
-					schneller und kann die Trainingsdaten sehr gut bestimmen. Dabei
-					zeigte sich, dass Overfitting in diesem Setup (glatte
-					Ziel-Funktion, relativ viele Datenpunkte) nicht unmittelbar
-					auftrat, sondern erst bei sehr hohen Epochenzahlen. Dies liegt
-					unter anderem daran, dass ein großes Netzwerk bei einer glatten
-					Funktion zunächst eine längere "Underfitting"-Phase durchläuft und
-					erst mit fortschreitendem Training beginnt, das vorhandene Rauschen
-					in den Daten zu modellieren. Gerade bei stärker verrauschten Daten
-					war dennoch beobachtbar, dass Overfitting früher und stärker
-					auftrat, je größer die Architektur war.</p>
+					schneller und kann die Trainingsdaten sehr gut bestimmen (Best-Fit
+					tritt früher ein). Dabei zeigte sich, dass Overfitting in diesem
+					Setup (glatte Ziel-Funktion, relativ viele Datenpunkte) nicht
+					unmittelbar auftrat, sondern erst bei sehr hohen Epochenzahlen.
+					Dies liegt unter anderem daran, dass ein großes Netzwerk bei einer
+					glatten Funktion zunächst eine längere "Underfitting"-Phase
+					durchläuft und erst mit fortschreitendem Training beginnt, das
+					vorhandene Rauschen in den Daten zu modellieren. Gerade bei stärker
+					verrauschten Daten war dennoch beobachtbar, dass Overfitting früher
+					und stärker auftrat, je größer die Architektur war.</p>
 
 				<p>Die Wahl der Aktivierungsfunktion zeigte, dass ReLU gegenüber
 					tanh eine stabilere Konvergenz und geringeres Overfitting-Verhalten
